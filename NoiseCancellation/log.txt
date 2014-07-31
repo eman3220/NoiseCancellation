@@ -1,10 +1,10 @@
 === To Do ===
-create a convolution mask
 apply it to original image
 put resulting pixels onto output 2d array
 display output image
 
 === Complete ===
+create a convolution masks for smoothing and median filtering
 Display original image
 Read original image
 Only allow a png file

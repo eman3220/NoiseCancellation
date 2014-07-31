@@ -53,10 +53,18 @@ public class NoiseCancellation {
 			
 			displayImage("original",img);
 			
-			// create convolution mask
-			int[][] mask = {{1,1,1},
-					{1,1,1},
-					{1,1,1}};
+			// create convolution masks
+			double[][] smoothingMask = {{0.11,0.11,0.11},
+					{0.11,0.11,0.11},
+					{0.11,0.11,0.11}};
+			
+			int[][] medianFilterMask = {{5,5,6},
+					{3,4,7},
+					{8,2,2}};
+			
+			// apply to original image
+			
+			// for each pixel (using 0 for the outside pixels)
 			
 		} catch (IOException e) {
 			e.printStackTrace();
