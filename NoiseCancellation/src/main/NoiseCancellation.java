@@ -28,9 +28,17 @@ public class NoiseCancellation {
 		int[][] output;
 
 		try {
+			// Read image in. 
 			BufferedImage bi = null;
+			int killCount = 0;
+			int killLimit = 100000000;
 			while (bi == null) {
+				if(killCount >= killLimit){
+					JOptionPane.showMessageDialog(null, "Could not read image. Please make sure it is a png");
+					System.exit(0);
+				}
 				bi = ImageIO.read(new File(imagepath));
+				killCount++;
 			}
 
 			// create 2d array images
@@ -40,7 +48,6 @@ public class NoiseCancellation {
 			// read in image pixels
 			for (int h = 0; h < bi.getHeight(); h++) {
 				for (int w = 0; w < bi.getWidth(); w++) {
-
 					int rgb = bi.getRGB(w, h);
 					int r = (rgb >> 16) & 0xFF;
 					int g = (rgb >> 8) & 0xFF;
@@ -51,29 +58,31 @@ public class NoiseCancellation {
 				}
 			}
 
+			// display the original image
 			displayImage("original", img);
 
 			// create convolution masks
-			double[][] smoothingMask = { { 0.11, 0.11, 0.11 },
-					{ 0.11, 0.11, 0.11 }, { 0.11, 0.11, 0.11 } };
+
+			// double[][] smoothingMask = { { 0.11, 0.11, 0.11 },
+			//		{ 0.11, 0.11, 0.11 }, { 0.11, 0.11, 0.11 } };
 
 			double[][] medianFilterMask = { { 5, 5, 6 }, { 3, 4, 7 }, { 8, 2, 2 } };
 
-			// apply to original image
+			int median = 0;
 			
-			// for each pixel (using 0 for the outside pixels)
+			// apply to original image
 			for (int hei = 0; hei < img[0].length; hei++) {
 				for (int wid = 0; wid < img.length; wid++) {
-
 					applyMask(img, output, medianFilterMask, wid, hei);
-
 				}
 			}
 			
+			// just incase we are out of range
 			if(maxValue>(255*3)){
 				fixValues(output);
 			}
 			
+			// display the new image
 			displayImage("new image", output);
 
 		} catch (IOException e) {
@@ -108,14 +117,9 @@ public class NoiseCancellation {
 	 * @param hei
 	 */
 	private void applyMask(int[][] img, int[][] output, double[][] mask, int wid, int hei) {
-		int left = wid - 1;
-		int right = wid + 1;
-		int up = hei - 1;
-		int down = hei + 1;
-
+		
 		// add all the squares together and the result is what the middle square
 		// will be.
-
 		int result = 0;
 		
 		for (int y = 0; y < mask[0].length; y++) { // height
@@ -132,11 +136,11 @@ public class NoiseCancellation {
 					continue;
 				}
 			}
-			//System.out.println();
 		}
-		//System.out.println(img[wid][hei]);
-		//System.out.println(result);
 		
+		// need to update the highest value we see to handle the range problem
+		// for the purposes of this assignment, minValue is not needed.
+		// no masks with negatives are used.
 		if(result>maxValue){
 			maxValue = result;
 		}
@@ -144,6 +148,11 @@ public class NoiseCancellation {
 		output[wid][hei] = result;
 	}
 
+	/**
+	 * Prints 2d image array to screen
+	 * @param name
+	 * @param image
+	 */
 	private void displayImage(String name, int[][] image) {
 		JFrame frame = new JFrame(name);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
