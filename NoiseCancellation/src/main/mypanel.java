@@ -15,19 +15,17 @@ public class mypanel extends JPanel{
 		g.setColor(Color.white);
 		g.fillRect(0, 0, 1000, 1000);
 
-
-		for (int i = 0; i < image.length; i++) {
-			for (int j = 0; j < image[i].length; j++) {
-				int co = image[i][j]/3;
+		for (int y = 0; y < image[0].length; y++) {
+			for (int x = 0; x < image.length; x++) {
+				int co = image[x][y]/3;
 				g.setColor(new Color(co,co,co));
-				g.drawRect(20+j, 20+i, 1, 1);
+				g.drawRect(20+x, 20+y, 1, 1);
 			}
 		}
 	}
 
 	public mypanel(int[][] thing){
 		this.image = thing;
-
 		repaint();
 	}
 

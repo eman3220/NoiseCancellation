@@ -8,6 +8,11 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+/**
+ * 
+ * @author Emmanuel
+ * 
+ */
 public class NoiseCancellation {
 
 	public static void main(String[] args) {
@@ -28,13 +33,15 @@ public class NoiseCancellation {
 		int[][] output;
 
 		try {
-			// Read image in. 
+			// Read image in.
 			BufferedImage bi = null;
 			int killCount = 0;
 			int killLimit = 100000000;
 			while (bi == null) {
-				if(killCount >= killLimit){
-					JOptionPane.showMessageDialog(null, "Could not read image. Please make sure it is a png");
+				if (killCount >= killLimit) {
+					JOptionPane
+							.showMessageDialog(null,
+									"Could not read image. Please make sure it is a png");
 					System.exit(0);
 				}
 				bi = ImageIO.read(new File(imagepath));
@@ -64,24 +71,25 @@ public class NoiseCancellation {
 			// create convolution masks
 
 			// double[][] smoothingMask = { { 0.11, 0.11, 0.11 },
-			//		{ 0.11, 0.11, 0.11 }, { 0.11, 0.11, 0.11 } };
+			// { 0.11, 0.11, 0.11 }, { 0.11, 0.11, 0.11 } };
 
-			double[][] medianFilterMask = { { 5, 5, 6 }, { 3, 4, 7 }, { 8, 2, 2 } };
+			double[][] medianFilterMask = { { 5, 5, 6 }, { 3, 4, 7 },
+					{ 8, 2, 2 } };
 
 			int median = 0;
-			
+
 			// apply to original image
 			for (int hei = 0; hei < img[0].length; hei++) {
 				for (int wid = 0; wid < img.length; wid++) {
 					applyMask(img, output, medianFilterMask, wid, hei);
 				}
 			}
-			
+
 			// just incase we are out of range
-			if(maxValue>(255*3)){
+			if (maxValue > (255 * 3)) {
 				fixValues(output);
 			}
-			
+
 			// display the new image
 			displayImage("new image", output);
 
@@ -89,18 +97,18 @@ public class NoiseCancellation {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 * Incase the result of the vector inner product is out of 
-	 * range (0-255)
+	 * Incase the result of the vector inner product is out of range (0-255)
+	 * 
 	 * @param output
 	 */
 	private void fixValues(int[][] output) {
 		for (int y = 0; y < output[0].length; y++) {
 			for (int x = 0; x < output.length; x++) {
-				double temp = (double)output[x][y] / (double)maxValue;
+				double temp = (double) output[x][y] / (double) maxValue;
 				double tempo = temp * 255;
-				output[x][y] = (int)tempo;
+				output[x][y] = (int) tempo;
 			}
 		}
 	}
@@ -116,40 +124,42 @@ public class NoiseCancellation {
 	 * @param wid
 	 * @param hei
 	 */
-	private void applyMask(int[][] img, int[][] output, double[][] mask, int wid, int hei) {
-		
+	private void applyMask(int[][] img, int[][] output, double[][] mask,
+			int wid, int hei) {
+
 		// add all the squares together and the result is what the middle square
 		// will be.
 		int result = 0;
-		
+
 		for (int y = 0; y < mask[0].length; y++) { // height
 			for (int x = 0; x < mask.length; x++) { // width
-				//System.out.print(mask[x][y] + " ");
-				
-				try{
-				int imgWid = wid-1+x;
-								
-				int imgHei = hei-1+y;
-				
-				result += img[imgWid][imgHei] * mask[x][y];
-				}catch(ArrayIndexOutOfBoundsException e){
+				// System.out.print(mask[x][y] + " ");
+
+				try {
+					int imgWid = wid - 1 + x;
+
+					int imgHei = hei - 1 + y;
+
+					result += img[imgWid][imgHei] * mask[x][y];
+				} catch (ArrayIndexOutOfBoundsException e) {
 					continue;
 				}
 			}
 		}
-		
+
 		// need to update the highest value we see to handle the range problem
 		// for the purposes of this assignment, minValue is not needed.
 		// no masks with negatives are used.
-		if(result>maxValue){
+		if (result > maxValue) {
 			maxValue = result;
 		}
-		
+
 		output[wid][hei] = result;
 	}
 
 	/**
 	 * Prints 2d image array to screen
+	 * 
 	 * @param name
 	 * @param image
 	 */
