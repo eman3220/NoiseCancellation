@@ -122,9 +122,6 @@ public class ImageHandler {
 			}
 		}
 
-		System.out.println(maxValue);
-		System.out.println(minValue);
-
 		// before returning image, make sure values are within bounds 0-255
 		if (maxValue > (255 * 3) || minValue < 0) {
 
